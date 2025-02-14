@@ -1,0 +1,26 @@
+// Показать попап
+export function showPopup (popupName) {
+  const popup = document.querySelector(popupName);
+  popup.classList.add('popup_is-opened');
+  document.addEventListener('keydown', escapeExitHandler);
+}
+
+// Убрать попап
+export function hidePopup (popupName) {
+  const popup = document.querySelector(popupName);
+  popup.classList.remove('popup_is-opened');
+  document.removeEventListener('keydown', escapeExitHandler);
+}
+
+// Выход из попапа на escape
+function escapeExitHandler(evt) {
+  const popup = document.querySelector('.popup_is-opened');
+  escapeExit(evt, popup);
+}
+
+function escapeExit(evt, popupElement) {
+  if (evt.key === 'Escape') {
+    evt.preventDefault();
+    hidePopup(`.${popupElement.classList[1]}`);
+  };
+};
