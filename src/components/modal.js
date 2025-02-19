@@ -1,13 +1,13 @@
 // Показать попап
-export function showPopup (popupName) {
-  const popup = document.querySelector(popupName);
+export function showPopup (popup) {
+ // const popup = document.querySelector(popupName);
   popup.classList.add('popup_is-opened');
   document.addEventListener('keydown', escapeExitHandler);
 }
 
 // Убрать попап
-export function hidePopup (popupName) {
-  const popup = document.querySelector(popupName);
+export function hidePopup (popup) {
+ // const popup = document.querySelector(popupName);
   popup.classList.remove('popup_is-opened');
   document.removeEventListener('keydown', escapeExitHandler);
 }
@@ -17,7 +17,7 @@ function escapeExitHandler(evt) {
   if (evt.key === 'Escape') {
     evt.preventDefault();
     const popup = document.querySelector('.popup_is-opened');
-    hidePopup('.popup_is-opened');
+    hidePopup(popup);
   }
 }
 
