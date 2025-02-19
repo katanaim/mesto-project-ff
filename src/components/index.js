@@ -37,30 +37,6 @@ function imagePopup (evt, cardElement) {
   }
 };
 
-// Обработчик открытия попапа на кнопку 
-profileEditButton.addEventListener('click', function () {
-  showPopup(popupTypeEdit);
-  
-});
-profileAddButton.addEventListener('click', function () {
-  showPopup(popupTypeNewCard);
-});
-
-
-// Обработчик закрытия попапов по кнопке и по оверлею
-popups.forEach(function (popupElement) {
-  const popupCloseButton = popupElement.querySelector('.popup__close');
-  popupCloseButton.addEventListener('click', function () {
-    hidePopup(popupElement);
-  });
-  popupElement.addEventListener('click', function (evt) {
-    if (evt.target === evt.currentTarget) {
-      hidePopup(popupElement);
-    }
-  });
-});
-
-
 
 //Редактирование имени и информации о себе
 function handleFormEditProfile(evt) {
@@ -73,9 +49,6 @@ function handleFormEditProfile(evt) {
   }
   hidePopup(popupTypeEdit);
 }
-
-formEditProfile.addEventListener('submit', handleFormEditProfile);
-
 
 //Создание новой карточки
 function handleFormNewPlace (evt) {
@@ -90,6 +63,31 @@ function handleFormNewPlace (evt) {
   hidePopup(popupTypeNewCard);
 }
 
+
+// Обработчик открытия попапа на кнопку 
+profileEditButton.addEventListener('click', function () {
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileDescription.textContent;
+  showPopup(popupTypeEdit);
+});
+profileAddButton.addEventListener('click', function () {
+  showPopup(popupTypeNewCard);
+});
+
+// Обработчик закрытия попапов по кнопке и по оверлею
+popups.forEach(function (popupElement) {
+  const popupCloseButton = popupElement.querySelector('.popup__close');
+  popupCloseButton.addEventListener('click', function () {
+    hidePopup(popupElement);
+  });
+  popupElement.addEventListener('click', function (evt) {
+    if (evt.target === evt.currentTarget) {
+      hidePopup(popupElement);
+    }
+  });
+});
+
+formEditProfile.addEventListener('submit', handleFormEditProfile);
 formNewPlace.addEventListener('submit', handleFormNewPlace);
 
 
