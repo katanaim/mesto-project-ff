@@ -28,13 +28,11 @@ initialCards.forEach(function (card) {
 }); 
 
 //Попап по нажатию на картинку
-function handleImageClick(evt, cardElement) {
-  if (evt.target === cardElement.querySelector('.card__image')) {
+function handleImageClick(evt, name) {
     popupImage.src  = evt.target.src; 
     popupImage.alt  = evt.target.alt; 
-    popupCaption.textContent  = cardElement.querySelector('.card__title').textContent;
+    popupCaption.textContent  = name;
     showPopup(popupTypeImage);
-  }
 };
 
 
