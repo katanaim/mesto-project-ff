@@ -23,12 +23,12 @@ const popupCaption = document.querySelector('.popup__caption');
 
 // Вывести карточки на страницу
 initialCards.forEach(function (card) {
-  const newCard = createCard(card, deleteCard, handleLikeButton, imagePopup);
+  const newCard = createCard(card, deleteCard, handleLikeButton, handleImageClick);
   placesList.append(newCard);
 }); 
 
 //Попап по нажатию на картинку
-function imagePopup (evt, cardElement) {
+function handleImageClick(evt, cardElement) {
   if (evt.target === cardElement.querySelector('.card__image')) {
     popupImage.src  = evt.target.src; 
     popupImage.alt  = evt.target.alt; 
@@ -57,7 +57,7 @@ function handleFormNewPlace (evt) {
     name: cardNameInput.value,
     link: cardImageInput.value
   };
-  const newCard = createCard(cardInfo, deleteCard, handleLikeButton, imagePopup);
+  const newCard = createCard(cardInfo, deleteCard, handleLikeButton, handleImageClick);
   placesList.prepend(newCard);
   formNewPlace.reset();
   hidePopup(popupTypeNewCard);
