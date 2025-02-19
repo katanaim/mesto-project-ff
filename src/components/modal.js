@@ -14,13 +14,10 @@ export function hidePopup (popupName) {
 
 // Выход из попапа на escape
 function escapeExitHandler(evt) {
-  const popup = document.querySelector('.popup_is-opened');
-  escapeExit(evt, popup);
-}
-
-function escapeExit(evt, popupElement) {
   if (evt.key === 'Escape') {
     evt.preventDefault();
-    hidePopup(`.${popupElement.classList[1]}`);
-  };
-};
+    const popup = document.querySelector('.popup_is-opened');
+    hidePopup('.popup_is-opened');
+  }
+}
+
