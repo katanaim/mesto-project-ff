@@ -2,6 +2,7 @@ import '../index.css';
 import { initialCards } from '../cards';
 import {createCard, deleteCard, handleLikeButton} from './card';
 import {showPopup, hidePopup} from './modal';
+import {clearValidation, enableValidation} from './validation';
 
 const profileEditButton = document.querySelector('.profile__edit-button');
 const profileAddButton = document.querySelector('.profile__add-button');
@@ -20,12 +21,16 @@ const popupTypeNewCard = document.querySelector('.popup_type_new-card');
 const popupTypeImage = document.querySelector('.popup_type_image');
 const popupImage = document.querySelector('.popup__image');
 const popupCaption = document.querySelector('.popup__caption');
+const profileImage = document.querySelector('.profile__image');
+const settings =  {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input-error',
+  errorClass: 'form__input-error_active'
+}; 
 
-// Вывести карточки на страницу
-initialCards.forEach(function (card) {
-  const newCard = createCard(card, deleteCard, handleLikeButton, handleImageClick);
-  placesList.append(newCard);
-}); 
 
 //Попап по нажатию на картинку
 function handleImageClick(evt, name) {
@@ -42,6 +47,7 @@ function handleFormEditProfile(evt) {
   if (jobInput && nameInput) {
     profileDescription.textContent = jobInput.value;
     profileTitle.textContent = nameInput.value;
+    patchUpdateProfile();
   } else {
     console.error('jobInput or nameInput is null');
   }
@@ -53,10 +59,12 @@ function handleFormNewPlace (evt) {
   evt.preventDefault(); 
   const cardInfo = {
     name: cardNameInput.value,
-    link: cardImageInput.value
+    link: cardImageInput.value,
+    likes: []
   };
   const newCard = createCard(cardInfo, deleteCard, handleLikeButton, handleImageClick);
   placesList.prepend(newCard);
+  postNewCard(cardInfo.name, cardInfo.link);
   formNewPlace.reset();
   hidePopup(popupTypeNewCard);
 }
@@ -66,10 +74,15 @@ function handleFormNewPlace (evt) {
 profileEditButton.addEventListener('click', function () {
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
+  const form = formEditProfile;
+  clearValidation (form, settings);
   showPopup(popupTypeEdit);
 });
+
 profileAddButton.addEventListener('click', function () {
   showPopup(popupTypeNewCard);
+  const form = formEditProfile;
+  clearValidation (form, settings);
 });
 
 // Обработчик закрытия попапов по кнопке и по оверлею
@@ -87,6 +100,101 @@ popups.forEach(function (popupElement) {
 
 formEditProfile.addEventListener('submit', handleFormEditProfile);
 formNewPlace.addEventListener('submit', handleFormNewPlace);
+
+enableValidation(settings); 
+
+
+
+
+
+
+
+
+
+//запрос чтобы получить данные пользователя
+
+export function fetchUserData() {
+  return fetch ('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
+    headers: {
+      authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa'
+    }
+  })
+  .then ((res) => {
+    return res.json();
+  });
+}
+
+
+
+//запрос чтобы получить карточки и вывести их
+function fetchCardsData() {
+  return fetch ('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
+    headers: {
+      authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa'
+    }
+  })
+  .then ((res) => {
+    return res.json();
+  })
+}
+
+
+Promise.all ([fetchUserData(), fetchCardsData()])
+.then(([dataUser, dataCards]) => {
+  profileTitle.textContent = dataUser.name;
+  profileDescription.textContent = dataUser.about;
+  const picture = dataUser.avatar;
+  profileImage.style.backgroundImage = `url(${picture})`;
+
+  dataCards.forEach(function (card) {
+    const newCard = createCard(card, deleteCard, handleLikeButton, handleImageClick);
+    placesList.append(newCard);
+  }); 
+})
+.catch((err) => {
+  console.log(err);
+});
+
+
+//отправить данные о пользователе
+function patchUpdateProfile() {
+  fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
+    method: 'PATCH',
+    headers: {
+      authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa',
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: profileTitle.textContent,
+      about: 'mumu'
+    })
+  });
+}
+
+
+//запрос на добавление новой карточки
+
+function postNewCard(name, link) {
+  fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
+    method: 'POST',
+    headers: {
+      authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa',
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: name,
+      link: link
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log('Card added:', data);
+  })
+  .catch(error => {
+    console.error('Error adding card:', error);
+  });
+}
+
 
 
 

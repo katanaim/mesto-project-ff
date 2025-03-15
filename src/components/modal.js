@@ -20,4 +20,3 @@ function escapeExitHandler(evt) {
     hidePopup(popup);
   }
 }
-
