@@ -1,5 +1,4 @@
 import '../index.css';
-import { initialCards } from '../cards';
 import {createCard, deleteCard, handleLikeButton} from './card';
 import {showPopup, hidePopup} from './modal';
 import {clearValidation, enableValidation} from './validation';
@@ -22,6 +21,10 @@ const popupTypeImage = document.querySelector('.popup_type_image');
 const popupImage = document.querySelector('.popup__image');
 const popupCaption = document.querySelector('.popup__caption');
 const profileImage = document.querySelector('.profile__image');
+const popupEditProfileImage = document.querySelector('.popup_type_edit-profile-image');
+const formEditProfileImage = document.forms['edit-profile-image'];
+const profileImageInput = document.querySelector('.popup__input_type_profile_image');
+
 const settings =  {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -144,7 +147,7 @@ Promise.all ([fetchUserData(), fetchCardsData()])
   profileTitle.textContent = dataUser.name;
   profileDescription.textContent = dataUser.about;
   const picture = dataUser.avatar;
-  profileImage.style.backgroundImage = `url(${picture})`;
+  profileImage.style.backgroundImage = `url('${picture}')`;
 
   dataCards.forEach(function (card) {
     const newCard = createCard(card, deleteCard, handleLikeButton, handleImageClick);
@@ -166,7 +169,8 @@ function patchUpdateProfile() {
     },
     body: JSON.stringify({
       name: profileTitle.textContent,
-      about: 'mumu'
+      about: profileDescription.textContent,
+      avatar: profileImage.style.backgroundImage.slice(5, -2) 
     })
   });
 }
@@ -198,3 +202,21 @@ function postNewCard(name, link) {
 
 
 
+//Открыть поп-ап редактирования профиля
+profileImage.addEventListener('click', function () {
+  showPopup(popupEditProfileImage);
+});
+
+//Редактирование фото профиля 
+function handleFormEditProfileImage(evt) {
+  evt.preventDefault();
+  if (profileImageInput) {
+    profileImage.style.backgroundImage = `url(${profileImageInput.value})`;
+    patchUpdateProfile();
+  } else {
+    console.error('profileImageInput is null');
+  }
+  hidePopup(popupEditProfileImage);
+}
+
+formEditProfileImage.addEventListener('submit', handleFormEditProfileImage);
