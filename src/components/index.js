@@ -161,7 +161,7 @@ Promise.all ([fetchUserData(), fetchCardsData()])
 
 //отправить данные о пользователе
 function patchUpdateProfile() {
-  fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
+  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
     method: 'PATCH',
     headers: {
       authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa',
@@ -169,10 +169,16 @@ function patchUpdateProfile() {
     },
     body: JSON.stringify({
       name: profileTitle.textContent,
-      about: profileDescription.textContent,
-      avatar: profileImage.style.backgroundImage.slice(5, -2) 
+      about: profileDescription.textContent
     })
-  });
+  })
+  .then(res => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  })
+  .catch(err => console.error(err));
 }
 
 
@@ -211,12 +217,28 @@ profileImage.addEventListener('click', function () {
 function handleFormEditProfileImage(evt) {
   evt.preventDefault();
   if (profileImageInput) {
-    profileImage.style.backgroundImage = `url(${profileImageInput.value})`;
-    patchUpdateProfile();
-  } else {
-    console.error('profileImageInput is null');
+    fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me/avatar', {
+      method: 'PATCH',
+      headers: {
+        authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa',
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        avatar: profileImageInput.value
+      })
+    })
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+      return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .then(data => {
+      profileImage.style.backgroundImage = `url('${data.avatar}')`;
+      hidePopup(popupEditProfileImage);
+    })
+    .catch(err => console.error(err));
   }
-  hidePopup(popupEditProfileImage);
 }
 
 formEditProfileImage.addEventListener('submit', handleFormEditProfileImage);
