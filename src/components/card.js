@@ -1,4 +1,4 @@
-import { fetchUserData } from './index.js';
+import { fetchUserData, fetchAddLike, fetchDeleteLike, fetchDeleteCard} from './api.js';
 
 // Функция создания карточки
 export function createCard ({name, link, likes, owner, _id}, deleteFunction, handleLikeButton, handleImageClick) {
@@ -22,16 +22,13 @@ export function createCard ({name, link, likes, owner, _id}, deleteFunction, han
   
   button.addEventListener('click', function () {
     deleteFunction(cardElement);
-    fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/${_id}`, {
-      method: 'DELETE',
-      headers: {
-        authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa'
-    } 
-  })
+    fetchDeleteCard(_id);
 
   });
   return cardElement; 
 }
+
+
 
 //Функция удаления карточки
 export function deleteCard (cardElement) {
@@ -40,36 +37,17 @@ export function deleteCard (cardElement) {
 
 //Лайк карточки
 export function handleLikeButton (evt, _id) {
-  
   evt.target.classList.toggle('card__like-button_is-active');
   if (evt.target.classList.contains('card__like-button_is-active')) {
-  return fetch (`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${_id}`, {
-    method: 'PUT',
-    headers: {
-      authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa'
-    }
-  })
-  .then ((res) => {
-    return res.json();
-  })
+  fetchAddLike(_id)
   .then ((data) => {
     evt.target.nextElementSibling.textContent = data.likes.length;
-    console.log(data.likes);
   });
   }
   else {
-  return fetch (`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${_id}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa'
-    }
-  })
-  .then((res) => {
-    return res.json();
-  })
+  fetchDeleteLike(_id)
   .then((data) => {
     evt.target.nextElementSibling.textContent = data.likes.length;
-    console.log(data.likes);
   });
   }
 }
