@@ -77,9 +77,6 @@ export function postNewCard(name, link) {
     }
     return Promise.reject(`Ошибка: ${res.status}`);
   })
-  .then(data => {
-    console.log('Card added:', data);
- })
   .catch(err => {
     console.error(err);
   });
