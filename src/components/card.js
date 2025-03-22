@@ -1,4 +1,4 @@
-import { fetchUserData } from '../components/index';
+import { fetchUserData } from './index.js';
 
 // Функция создания карточки
 export function createCard ({name, link, likes, owner, _id}, deleteFunction, handleLikeButton, handleImageClick) {

@@ -47,10 +47,15 @@ function handleImageClick(evt, name) {
 //Редактирование имени и информации о себе
 function handleFormEditProfile(evt) {
   evt.preventDefault();
+  const button = evt.target.querySelector('.popup__button');
   if (jobInput && nameInput) {
+    button.textContent = 'Сохранение...';
     profileDescription.textContent = jobInput.value;
     profileTitle.textContent = nameInput.value;
-    patchUpdateProfile();
+    patchUpdateProfile(profileTitle.textContent, profileDescription.textContent)
+    .finally(() => {
+      button.textContent = 'Сохранить';
+    });
   } else {
     console.error('jobInput or nameInput is null');
   }
@@ -59,15 +64,21 @@ function handleFormEditProfile(evt) {
 
 //Создание новой карточки
 function handleFormNewPlace (evt) {
+  const button = evt.target.querySelector('.popup__button');
+  button.textContent = 'Сохранение...';
   evt.preventDefault(); 
   const cardInfo = {
     name: cardNameInput.value,
     link: cardImageInput.value,
-    likes: []
+    likes: [],
+    owner: [],
   };
   const newCard = createCard(cardInfo, deleteCard, handleLikeButton, handleImageClick);
   placesList.prepend(newCard);
-  postNewCard(cardInfo.name, cardInfo.link);
+  postNewCard(cardInfo.name, cardInfo.link)
+  .finally(() => {
+    button.textContent = 'Сохранить';
+  });
   formNewPlace.reset();
   hidePopup(popupTypeNewCard);
 }
@@ -114,7 +125,7 @@ enableValidation(settings);
 
 
 
-//запрос чтобы получить данные пользователя
+//запрос чтобы получить данные пользователя (экспортируемая)
 
 export function fetchUserData() {
   return fetch ('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
@@ -129,7 +140,7 @@ export function fetchUserData() {
 
 
 
-//запрос чтобы получить карточки и вывести их
+//запрос чтобы получить карточки и вывести их (экспортируемая)
 function fetchCardsData() {
   return fetch ('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
     headers: {
@@ -159,8 +170,8 @@ Promise.all ([fetchUserData(), fetchCardsData()])
 });
 
 
-//отправить данные о пользователе
-function patchUpdateProfile() {
+//отправить данные о пользователе (экспортируемая)
+function patchUpdateProfile(title, description) {
   return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
     method: 'PATCH',
     headers: {
@@ -168,8 +179,8 @@ function patchUpdateProfile() {
       'Content-type': 'application/json'
     },
     body: JSON.stringify({
-      name: profileTitle.textContent,
-      about: profileDescription.textContent
+      name: title,
+      about: description
     })
   })
   .then(res => {
@@ -182,10 +193,10 @@ function patchUpdateProfile() {
 }
 
 
-//запрос на добавление новой карточки
+//запрос на добавление новой карточки (экспортируемая)
 
 function postNewCard(name, link) {
-  fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
+  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
     method: 'POST',
     headers: {
       authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa',
@@ -198,10 +209,10 @@ function postNewCard(name, link) {
   })
   .then(response => response.json())
   .then(data => {
-    console.log('Card added:', data);
+     console.log('Card added:', name);
   })
   .catch(error => {
-    console.error('Error adding card:', error);
+     console.error('Error adding card:', error);
   });
 }
 
@@ -217,28 +228,33 @@ profileImage.addEventListener('click', function () {
 function handleFormEditProfileImage(evt) {
   evt.preventDefault();
   if (profileImageInput) {
-    fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me/avatar', {
-      method: 'PATCH',
-      headers: {
-        authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa',
-        'Content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        avatar: profileImageInput.value
-      })
-    })
-    .then(res => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка: ${res.status}`);
-    })
+    postProfileImage(profileImageInput)
     .then(data => {
       profileImage.style.backgroundImage = `url('${data.avatar}')`;
       hidePopup(popupEditProfileImage);
     })
     .catch(err => console.error(err));
   }
+}
+
+//функция отправки нового фото профиля  (экспортируемая)
+function postProfileImage (profileImageInput) {
+  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me/avatar', {
+    method: 'PATCH',
+    headers: {
+      authorization: '4ced1f7f-b5e7-41c7-b685-2106f174e3aa',
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      avatar: profileImageInput.value
+    })
+  })
+  .then(res => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  })
 }
 
 formEditProfileImage.addEventListener('submit', handleFormEditProfileImage);
