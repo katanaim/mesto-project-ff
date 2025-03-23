@@ -73,21 +73,19 @@ function handleFormNewPlace (evt) {
   const button = evt.target.querySelector('.popup__button');
   button.textContent = 'Сохранение...';
   evt.preventDefault(); 
-  const cardInfo = {
-    name: cardNameInput.value,
-    link: cardImageInput.value,
-    likes: [],
-    owner: [],
-  };
-  const newCard = createCard(cardInfo, deleteCard, handleLikeButton, handleImageClick);
-  placesList.prepend(newCard);
-  postNewCard(cardInfo.name, cardInfo.link)
+  postNewCard(cardNameInput.value, cardImageInput.value)
+  .then ((data) => {
+    console.log(data);
+    const newCard = createCard(data, deleteCard, handleLikeButton, handleImageClick);
+    placesList.prepend(newCard);
+  })
   .catch ( err => {
     console.log(err);
   })
   .finally(() => {
     button.textContent = 'Сохранить';
   });
+  
   formNewPlace.reset();
   hidePopup(popupTypeNewCard);
 }
