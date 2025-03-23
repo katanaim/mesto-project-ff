@@ -15,7 +15,6 @@ export function hidePopup (popup) {
 // Выход из попапа на escape
 function escapeExitHandler(evt) {
   if (evt.key === 'Escape') {
-    evt.preventDefault();
     const popup = document.querySelector('.popup_is-opened');
     hidePopup(popup);
   }

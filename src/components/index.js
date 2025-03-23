@@ -54,6 +54,9 @@ function handleFormEditProfile(evt) {
     profileDescription.textContent = jobInput.value;
     profileTitle.textContent = nameInput.value;
     patchUpdateProfile(profileTitle.textContent, profileDescription.textContent)
+    .catch(err => {
+      console.error(err);
+    })
     .finally(() => {
       button.textContent = 'Сохранить';
     });
@@ -77,6 +80,9 @@ function handleFormNewPlace (evt) {
   const newCard = createCard(cardInfo, deleteCard, handleLikeButton, handleImageClick);
   placesList.prepend(newCard);
   postNewCard(cardInfo.name, cardInfo.link)
+  .catch ( err => {
+    console.log(err);
+  })
   .finally(() => {
     button.textContent = 'Сохранить';
   });

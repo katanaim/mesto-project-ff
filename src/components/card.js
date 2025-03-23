@@ -15,15 +15,21 @@ export function createCard ({name, link, likes, owner, _id}, deleteFunction, han
   cardElementImage.addEventListener('click', (evt) => handleImageClick(evt, name));
   
   const button = cardElement.querySelector('.card__delete-button');
-  fetchUserData().then((data) => {
+  fetchUserData()
+  .then((data) => {
     if (data._id === owner._id) {
       cardElement.querySelector('.card__delete-button').classList.add('card__delete-button_visible');
-    }});
+    }})
+    .catch(err => {
+      console.error(err);
+    });
   
   button.addEventListener('click', function () {
     deleteFunction(cardElement);
-    fetchDeleteCard(_id);
-
+    fetchDeleteCard(_id)
+    .catch(res => {
+      console.log(err);
+    });
   });
   return cardElement; 
 }
@@ -42,12 +48,18 @@ export function handleLikeButton (evt, _id) {
   fetchAddLike(_id)
   .then ((data) => {
     evt.target.nextElementSibling.textContent = data.likes.length;
+  })
+  .catch( err => {
+    console.log(err);
   });
   }
   else {
   fetchDeleteLike(_id)
   .then((data) => {
     evt.target.nextElementSibling.textContent = data.likes.length;
+  })
+  .catch( err => {
+    console.log(err);
   });
   }
 }
