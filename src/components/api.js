@@ -67,8 +67,7 @@ export function fetchAddLike(_id) {
   return fetch(`${config.baseUrl}/cards/likes/${_id}`, {
     method: "PUT",
     headers: config.headers,
-  })
-  .then(getResponseData);
+  }).then(getResponseData);
 }
 
 //Функция удаления лайка (экспортируемая)
