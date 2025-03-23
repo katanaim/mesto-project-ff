@@ -1,4 +1,5 @@
-import { fetchUserData, fetchAddLike, fetchDeleteLike, fetchDeleteCard} from './api.js';
+import { fetchAddLike, fetchDeleteLike, fetchDeleteCard} from './api.js';
+import { userData } from './index.js';
 
 // Функция создания карточки
 export function createCard ({name, link, likes, owner, _id}, deleteFunction, handleLikeButton, handleImageClick) {
@@ -11,23 +12,23 @@ export function createCard ({name, link, likes, owner, _id}, deleteFunction, han
   cardElementImage.alt = name;
   cardElementLikes.textContent = likes.length;
   const likeButton = cardElement.querySelector('.card__like-button');
-  likeButton.addEventListener('click', (evt) => handleLikeButton(evt, _id));
+  if (checkLikeStatus(likes, userData._id)) {
+    likeButton.classList.add('card__like-button_is-active');
+  }
+  likeButton.addEventListener('click', (evt) => handleLikeButton(evt, likes, _id));
   cardElementImage.addEventListener('click', (evt) => handleImageClick(evt, name));
   
   const button = cardElement.querySelector('.card__delete-button');
-  fetchUserData()
-  .then((data) => {
-    if (data._id === owner._id) {
+    if (userData._id === owner._id) {
       cardElement.querySelector('.card__delete-button').classList.add('card__delete-button_visible');
-    }})
-    .catch(err => {
-      console.error(err);
-    });
+    };
   
   button.addEventListener('click', function () {
-    deleteFunction(cardElement);
     fetchDeleteCard(_id)
-    .catch(res => {
+    .then(() => {
+        deleteFunction(cardElement);
+    })
+    .catch(err => {
       console.log(err);
     });
   });
@@ -42,12 +43,14 @@ export function deleteCard (cardElement) {
 }
 
 //Лайк карточки
-export function handleLikeButton (evt, _id) {
-  evt.target.classList.toggle('card__like-button_is-active');
-  if (evt.target.classList.contains('card__like-button_is-active')) {
+export function handleLikeButton (evt, likes, _id) {
+  
+  if (!checkLikeStatus (likes, userData._id)) {
   fetchAddLike(_id)
   .then ((data) => {
+    likes.splice(0, likes.length, ...data.likes);
     evt.target.nextElementSibling.textContent = data.likes.length;
+    evt.target.classList.add('card__like-button_is-active');
   })
   .catch( err => {
     console.log(err);
@@ -56,11 +59,20 @@ export function handleLikeButton (evt, _id) {
   else {
   fetchDeleteLike(_id)
   .then((data) => {
+    likes.splice(0, likes.length, ...data.likes);
     evt.target.nextElementSibling.textContent = data.likes.length;
+    evt.target.classList.remove('card__like-button_is-active');
   })
   .catch( err => {
     console.log(err);
   });
   }
+}
+
+//Проверка состояния лайка
+function checkLikeStatus (likes, userId) {
+  return likes.some( (like) => {
+    return like._id === userId
+});
 }
 

@@ -3,6 +3,7 @@ import {createCard, deleteCard, handleLikeButton} from './card';
 import {showPopup, hidePopup} from './modal';
 import {clearValidation, enableValidation} from './validation';
 import {fetchUserData, fetchCardsData, patchUpdateProfile, postNewCard, postProfileImage} from './api';
+export let userData;
 
 const profileEditButton = document.querySelector('.profile__edit-button');
 const profileAddButton = document.querySelector('.profile__add-button');
@@ -25,6 +26,7 @@ const profileImage = document.querySelector('.profile__image');
 const popupEditProfileImage = document.querySelector('.popup_type_edit-profile-image');
 const formEditProfileImage = document.forms['edit-profile-image'];
 const profileImageInput = document.querySelector('.popup__input_type_profile_image');
+
 
 const settings =  {
   formSelector: '.popup__form',
@@ -127,6 +129,8 @@ enableValidation(settings);
 
 Promise.all ([fetchUserData(), fetchCardsData()])
 .then(([dataUser, dataCards]) => {
+  userData = dataUser;
+  console.log(userData);
   profileTitle.textContent = dataUser.name;
   profileDescription.textContent = dataUser.about;
   const picture = dataUser.avatar;
@@ -140,6 +144,8 @@ Promise.all ([fetchUserData(), fetchCardsData()])
 .catch((err) => {
   console.log(err);
 });
+
+
 
 //Открыть поп-ап редактирования профиля
 profileImage.addEventListener('click', function () {
