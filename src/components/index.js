@@ -92,7 +92,6 @@ function handleFormNewPlace(evt) {
   evt.preventDefault();
   postNewCard(cardNameInput.value, cardImageInput.value)
     .then((data) => {
-      console.log(data);
       const newCard = createCard(
         data,
         deleteCard,
@@ -101,6 +100,7 @@ function handleFormNewPlace(evt) {
       );
       placesList.prepend(newCard);
       hidePopup(popupTypeNewCard);
+      formNewPlace.reset();
     })
     .catch((err) => {
       console.log(err);
@@ -108,24 +108,19 @@ function handleFormNewPlace(evt) {
     .finally(() => {
       renderLoading(button, false);
     });
-
-  formNewPlace.reset();
 }
 
 // Обработчик открытия попапа на кнопку
 profileEditButton.addEventListener("click", function () {
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
-  const form = formEditProfile;
-  clearValidation(form, settings);
-  form.reset();
+  clearValidation(formEditProfile, settings);
   showPopup(popupTypeEdit);
 });
 
 profileAddButton.addEventListener("click", function () {
-  const form = formEditProfile;
-  clearValidation(form, settings);
-  form.reset();
+  formNewPlace.reset();
+  clearValidation(formNewPlace, settings);
   showPopup(popupTypeNewCard);
 });
 
@@ -150,7 +145,6 @@ enableValidation(settings);
 Promise.all([fetchUserData(), fetchCardsData()])
   .then(([dataUser, dataCards]) => {
     userData = dataUser;
-    console.log(userData);
     profileTitle.textContent = dataUser.name;
     profileDescription.textContent = dataUser.about;
     const picture = dataUser.avatar;
@@ -172,6 +166,8 @@ Promise.all([fetchUserData(), fetchCardsData()])
 
 //Открыть поп-ап редактирования профиля
 profileImage.addEventListener("click", function () {
+  formEditProfileImage.reset();
+  clearValidation(formEditProfileImage, settings);
   showPopup(popupEditProfileImage);
 });
 

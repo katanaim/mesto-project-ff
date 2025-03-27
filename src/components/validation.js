@@ -39,6 +39,7 @@ function addFormEventListeners(form, settings) {
       toggleButtonState(form, inputs, settings);
     });
   });
+  toggleButtonState(form, inputs, settings);
 }
 
 //раскидать на все формы документа
